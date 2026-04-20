@@ -1,4 +1,6 @@
 import aboutStory from "@/assets/about-story.jpg";
+import { Button } from "@/components/ui/button";
+import { Link } from "react-router-dom";
 
 const About = () => (
   <main className="pt-20 sm:pt-24">
@@ -6,6 +8,9 @@ const About = () => (
       <div className="text-center mb-16">
         <p className="text-sm tracking-[0.3em] uppercase text-muted-foreground mb-2">Our Story</p>
         <h1 className="text-3xl sm:text-4xl font-heading">About Rabina Closet</h1>
+          <p className="text-muted-foreground text-sm mt-3 max-w-2xl mx-auto">
+            We design every collection to make everyday dressing elegant, comfortable, and confidence-boosting.
+          </p>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
@@ -47,6 +52,14 @@ const About = () => (
           To empower every woman to express her unique style with affordable, high-quality fashion.
           We believe that confidence starts with how you feel in your clothes — and we're here to make that feeling accessible to everyone.
         </p>
+        <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-3">
+          <Button asChild>
+            <Link to="/shop">Shop Collection</Link>
+          </Button>
+          <Button asChild variant="outline">
+            <Link to="/contact">Contact Us</Link>
+          </Button>
+        </div>
       </div>
     </section>
   </main>

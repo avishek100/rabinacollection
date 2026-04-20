@@ -27,7 +27,7 @@ const Footer = () => {
             <h4 className="font-medium text-sm uppercase tracking-widest mb-4">Quick Links</h4>
             <div className="space-y-2">
               {[{ to: "/shop", label: "Shop" }, { to: "/about", label: "About" }, { to: "/contact", label: "Contact" }].map((link) => (
-                <Link key={link.to} to={link.to} className="block text-sm opacity-80 hover:opacity-100 transition-opacity">
+                <Link key={link.to} to={link.to} className="block text-sm opacity-80 hover:opacity-100 hover:translate-x-1 transition-all">
                   {link.label}
                 </Link>
               ))}
@@ -45,7 +45,7 @@ const Footer = () => {
             <h4 className="font-medium text-sm uppercase tracking-widest mb-4">Follow Us</h4>
             <div className="flex gap-4">
               {socials.instagram ? (
-                <a href={socials.instagram} aria-label="Instagram" className="opacity-80 hover:opacity-100 transition-opacity">
+                <a href={socials.instagram} target="_blank" rel="noreferrer" aria-label="Instagram" className="opacity-80 hover:opacity-100 transition-opacity">
                   <Instagram size={20} />
                 </a>
               ) : (
@@ -54,7 +54,7 @@ const Footer = () => {
                 </span>
               )}
               {socials.facebook ? (
-                <a href={socials.facebook} aria-label="Facebook" className="opacity-80 hover:opacity-100 transition-opacity">
+                <a href={socials.facebook} target="_blank" rel="noreferrer" aria-label="Facebook" className="opacity-80 hover:opacity-100 transition-opacity">
                   <Facebook size={20} />
                 </a>
               ) : (
@@ -63,7 +63,7 @@ const Footer = () => {
                 </span>
               )}
               {socials.tiktok ? (
-                <a href={socials.tiktok} aria-label="TikTok" className="opacity-80 hover:opacity-100 transition-opacity">
+                <a href={socials.tiktok} target="_blank" rel="noreferrer" aria-label="TikTok" className="opacity-80 hover:opacity-100 transition-opacity">
                   <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1 0-5.78 2.92 2.92 0 0 1 .88.13v-3.5a6.37 6.37 0 0 0-.88-.07 6.26 6.26 0 0 0 0 12.52 6.27 6.27 0 0 0 6.26-6.27V8.55a8.16 8.16 0 0 0 3.84.96V6.09a4.84 4.84 0 0 1-1-.1z" /></svg>
                 </a>
               ) : (

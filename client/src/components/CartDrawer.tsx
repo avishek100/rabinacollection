@@ -1,7 +1,7 @@
-import { useCart } from "@/context/CartContext";
-import { X, Trash2, MessageCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useCart } from "@/context/CartContext";
 import { formatCurrency } from "@/lib/utils";
+import { MessageCircle, Trash2, X } from "lucide-react";
 
 const CartDrawer = () => {
   const { items, removeItem, totalPrice, isOpen, setIsOpen } = useCart();
@@ -13,7 +13,8 @@ const CartDrawer = () => {
       .map((i) => `${i.product.name} (${i.size}) x${i.quantity} - ${formatCurrency(i.product.price * i.quantity)}`)
       .join("\n");
     const total = `\n\nTotal: ${formatCurrency(totalPrice)}`;
-    const url = `https://wa.me/?text=${encodeURIComponent("Hi! I'd like to order:\n" + message + total)}`;
+    const waBase = import.meta.env.VITE_WHATSAPP_BASE || "https://wa.me/";
+    const url = `${waBase}?text=${encodeURIComponent("Hi! I'd like to order:\n" + message + total)}`;
     window.open(url, "_blank");
   };
 
@@ -21,7 +22,7 @@ const CartDrawer = () => {
     <>
       <div className="fixed inset-0 bg-foreground/20 z-50" onClick={() => setIsOpen(false)} />
       <div className="fixed right-0 top-0 h-full w-full max-w-md bg-background z-50 shadow-xl flex flex-col animate-slide-in-right">
-        <div className="flex items-center justify-between p-6 border-b border-border">
+        <div className="flex items-center justify-between p-4 sm:p-6 border-b border-border">
           <h2 className="font-heading text-lg">Your Bag</h2>
           <button onClick={() => setIsOpen(false)} className="text-muted-foreground hover:text-foreground">
             <X size={20} />
@@ -34,10 +35,10 @@ const CartDrawer = () => {
           </div>
         ) : (
           <>
-            <div className="flex-1 overflow-y-auto p-6 space-y-4">
+            <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-4">
               {items.map((item) => (
-                <div key={item.product.id + item.size} className="flex gap-4">
-                  <img src={item.product.image} alt={item.product.name} className="w-20 h-24 object-cover rounded" />
+                <div key={item.product.id + item.size} className="flex gap-3 sm:gap-4">
+                  <img src={item.product.image} alt={item.product.name} className="w-16 sm:w-20 h-20 sm:h-24 object-cover rounded" />
                   <div className="flex-1">
                     <h3 className="text-sm font-medium">{item.product.name}</h3>
                     <p className="text-xs text-muted-foreground mt-1">Size: {item.size} · Qty: {item.quantity}</p>
@@ -49,7 +50,7 @@ const CartDrawer = () => {
                 </div>
               ))}
             </div>
-            <div className="p-6 border-t border-border space-y-4">
+            <div className="p-4 sm:p-6 border-t border-border space-y-4">
               <div className="flex justify-between font-medium">
                 <span>Total</span>
                 <span>{formatCurrency(totalPrice)}</span>

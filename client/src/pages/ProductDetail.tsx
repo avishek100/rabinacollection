@@ -1,11 +1,11 @@
-import { useParams, Link } from "react-router-dom";
-import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
-import { useCart } from "@/context/CartContext";
 import { Button } from "@/components/ui/button";
-import { formatCurrency } from "@/lib/utils";
+import { useCart } from "@/context/CartContext";
 import { getProduct } from "@/lib/api";
-import { MessageCircle, ArrowLeft } from "lucide-react";
+import { formatCurrency } from "@/lib/utils";
+import { useQuery } from "@tanstack/react-query";
+import { ArrowLeft, MessageCircle } from "lucide-react";
+import { useState } from "react";
+import { Link, useParams } from "react-router-dom";
 
 const ProductDetail = () => {
   const { id = "" } = useParams();
@@ -44,7 +44,8 @@ const ProductDetail = () => {
 
   const orderWhatsApp = () => {
     const msg = `Hi! I'd like to order: ${product.name} (Size: ${selectedSize || "N/A"}) - ${formatCurrency(product.price)}`;
-    window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, "_blank");
+    const waBase = import.meta.env.VITE_WHATSAPP_BASE || "https://wa.me/";
+    window.open(`${waBase}?text=${encodeURIComponent(msg)}`, "_blank");
   };
 
   return (
@@ -60,14 +61,13 @@ const ProductDetail = () => {
               <img src={product.images[activeImage]} alt={product.name} className="w-full h-full object-cover" width={800} height={1024} />
             </div>
             {product.images.length > 1 && (
-              <div className="flex gap-2">
+              <div className="flex gap-2 overflow-x-auto pb-2">
                 {product.images.map((img, index) => (
                   <button
                     key={img + index}
                     onClick={() => setActiveImage(index)}
-                    className={`w-20 h-24 rounded overflow-hidden border-2 transition-colors ${
-                      activeImage === index ? "border-foreground" : "border-transparent"
-                    }`}
+                    className={`w-20 min-w-20 h-24 rounded overflow-hidden border-2 transition-colors ${activeImage === index ? "border-foreground" : "border-transparent"
+                      }`}
                   >
                     <img src={img} alt="" className="w-full h-full object-cover" loading="lazy" />
                   </button>
@@ -82,6 +82,7 @@ const ProductDetail = () => {
                 {product.badge}
               </span>
             )}
+            <p className="text-xs tracking-widest uppercase text-muted-foreground">{product.category}</p>
             <h1 className="text-2xl sm:text-3xl font-heading">{product.name}</h1>
             <p className="text-xl">{formatCurrency(product.price)}</p>
             <p className="text-sm text-muted-foreground leading-relaxed">{product.description}</p>
@@ -93,16 +94,16 @@ const ProductDetail = () => {
                   <button
                     key={size}
                     onClick={() => setSelectedSize(size)}
-                    className={`w-12 h-12 rounded text-sm transition-colors ${
-                      selectedSize === size
+                    className={`w-12 h-12 rounded text-sm transition-colors ${selectedSize === size
                         ? "bg-primary text-primary-foreground"
                         : "bg-muted text-muted-foreground hover:bg-secondary"
-                    }`}
+                      }`}
                   >
                     {size}
                   </button>
                 ))}
               </div>
+              {selectedSize && <p className="mt-3 text-xs text-muted-foreground">Selected size: {selectedSize}</p>}
             </div>
 
             <div className="space-y-3 pt-4">
@@ -114,6 +115,13 @@ const ProductDetail = () => {
                 Order via WhatsApp
               </Button>
               <p className="text-xs text-center text-muted-foreground">Cash on Delivery · Free shipping over {formatCurrency(3000)}</p>
+            </div>
+
+            <div className="rounded-xl border border-border bg-muted/30 p-4">
+              <p className="text-sm font-medium">Why shop this piece?</p>
+              <p className="mt-2 text-sm text-muted-foreground">
+                Premium finishing, curated fit, and easy support through WhatsApp before and after order.
+              </p>
             </div>
           </div>
         </div>

@@ -15,6 +15,9 @@ Copy `server/.env.example` to `server/.env` and set:
 - `CLIENT_ORIGIN`
 - `MONGODB_URI`
 - `ADMIN_API_KEY`
+ - `CLOUDINARY_CLOUD_NAME` (your Cloudinary cloud name)
+ - `CLOUDINARY_API_KEY` (Cloudinary API key)
+ - `CLOUDINARY_API_SECRET` (Cloudinary API secret)
 
 ## Default URL
 
@@ -35,3 +38,9 @@ Copy `server/.env.example` to `server/.env` and set:
 - `POST /api/admin/products`
 - `PUT /api/admin/products/:id`
 - `DELETE /api/admin/products/:id`
+
+## Image uploads
+
+The server uploads images to Cloudinary. Set the Cloudinary environment variables listed above. If you don't provide them, the upload endpoints will return errors when called.
+
+To create an example env file, copy `server/.env.example` to `server/.env` and fill in the values.

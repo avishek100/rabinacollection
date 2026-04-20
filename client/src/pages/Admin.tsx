@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 import {
     AdminCategory,
@@ -291,86 +292,191 @@ const Admin = () => {
                 ) : (
                     <div className="grid grid-cols-1 xl:grid-cols-[360px_1fr] gap-8">
                         <section className="space-y-8">
-                            <div className="border border-border rounded-lg p-6 bg-card">
-                                <h2 className="font-heading text-xl mb-4">Add Category</h2>
-                                <form className="space-y-4" onSubmit={handleCategorySubmit}>
-                                    <div>
-                                        <label htmlFor="categoryName" className="block text-xs tracking-widest uppercase text-muted-foreground mb-2">Category Name</label>
-                                        <input id="categoryName" required value={categoryName} onChange={(event) => setCategoryName(event.target.value)} className="w-full px-4 py-3 bg-background border border-border rounded text-sm focus:outline-none focus:ring-1 focus:ring-ring" />
-                                    </div>
-                                    <Button type="submit" className="w-full" disabled={createCategoryMutation.isPending}>{createCategoryMutation.isPending ? "Saving..." : "Save Category"}</Button>
-                                </form>
-                                <div className="mt-5 space-y-2">
-                                    <p className="text-xs tracking-widest uppercase text-muted-foreground">Current Categories</p>
-                                    {categoriesQuery.isLoading ? (
-                                        <p className="text-sm text-muted-foreground">Loading categories...</p>
-                                    ) : (
-                                        availableCategories.map((category: AdminCategory) => (
-                                            <div key={category.id} className="text-sm bg-muted px-3 py-2 rounded">{category.name}</div>
-                                        ))
-                                    )}
-                                </div>
-                            </div>
+                            <div className="border border-border rounded-lg p-4 bg-card">
+                                <Tabs defaultValue="product">
+                                    <TabsList>
+                                        <TabsTrigger value="category">Category</TabsTrigger>
+                                        <TabsTrigger value="product">Product</TabsTrigger>
+                                        <TabsTrigger value="uploads">Uploads</TabsTrigger>
+                                    </TabsList>
 
-                            <div className="border border-border rounded-lg p-6 bg-card">
-                                <div className="flex items-center justify-between gap-3 mb-4">
-                                    <h2 className="font-heading text-xl">{productForm.id ? "Edit Product" : "Add Product"}</h2>
-                                    {productForm.id && (
-                                        <Button variant="outline" onClick={() => setProductForm(emptyProductForm)}>Cancel Edit</Button>
-                                    )}
-                                </div>
-                                <form className="space-y-4" onSubmit={handleProductSubmit}>
-                                    <div>
-                                        <label htmlFor="name" className="block text-xs tracking-widest uppercase text-muted-foreground mb-2">Product Name</label>
-                                        <input id="name" name="name" required value={productForm.name} onChange={handleProductChange} className="w-full px-4 py-3 bg-background border border-border rounded text-sm focus:outline-none focus:ring-1 focus:ring-ring" />
-                                    </div>
-                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                        <div>
-                                            <label htmlFor="price" className="block text-xs tracking-widest uppercase text-muted-foreground mb-2">Price</label>
-                                            <input id="price" name="price" required type="number" min="0" value={productForm.price} onChange={handleProductChange} className="w-full px-4 py-3 bg-background border border-border rounded text-sm focus:outline-none focus:ring-1 focus:ring-ring" />
-                                        </div>
-                                        <div>
-                                            <label htmlFor="badge" className="block text-xs tracking-widest uppercase text-muted-foreground mb-2">Badge</label>
-                                            <input id="badge" name="badge" value={productForm.badge} onChange={handleProductChange} className="w-full px-4 py-3 bg-background border border-border rounded text-sm focus:outline-none focus:ring-1 focus:ring-ring" />
-                                        </div>
-                                    </div>
-                                    <div>
-                                        <label htmlFor="category" className="block text-xs tracking-widest uppercase text-muted-foreground mb-2">Category</label>
-                                        <select id="category" name="category" required value={productForm.category} onChange={handleProductChange} className="w-full px-4 py-3 bg-background border border-border rounded text-sm focus:outline-none focus:ring-1 focus:ring-ring">
-                                            <option value="">Select category</option>
-                                            {availableCategories.map((category) => (
-                                                <option key={category.id} value={category.name}>{category.name}</option>
-                                            ))}
-                                        </select>
-                                    </div>
-                                    <div>
-                                        <label className="block text-xs tracking-widest uppercase text-muted-foreground mb-2">Main Image</label>
-                                        {mainPreviewUrl ? (
-                                            <div className="mb-3">
-                                                <img src={mainPreviewUrl} alt="main-preview" className="w-full h-48 object-cover rounded" />
+                                    <TabsContent value="category">
+                                        <div className="p-4">
+                                            <h3 className="font-heading text-lg mb-3">Add Category</h3>
+                                            <form className="space-y-4" onSubmit={handleCategorySubmit}>
+                                                <div>
+                                                    <label htmlFor="categoryName" className="block text-xs tracking-widest uppercase text-muted-foreground mb-2">Category Name</label>
+                                                    <input id="categoryName" required value={categoryName} onChange={(event) => setCategoryName(event.target.value)} className="w-full px-4 py-3 bg-background border border-border rounded text-sm focus:outline-none focus:ring-1 focus:ring-ring" />
+                                                </div>
+                                                <Button type="submit" className="w-full" disabled={createCategoryMutation.isPending}>{createCategoryMutation.isPending ? "Saving..." : "Save Category"}</Button>
+                                            </form>
+
+                                            <div className="mt-5 space-y-2">
+                                                <p className="text-xs tracking-widest uppercase text-muted-foreground">Current Categories</p>
+                                                {categoriesQuery.isLoading ? (
+                                                    <p className="text-sm text-muted-foreground">Loading categories...</p>
+                                                ) : (
+                                                    availableCategories.map((category: AdminCategory) => (
+                                                        <div key={category.id} className="text-sm bg-muted px-3 py-2 rounded">{category.name}</div>
+                                                    ))
+                                                )}
                                             </div>
-                                        ) : productForm.image ? (
-                                            <div className="mb-3">
-                                                <img src={productForm.image} alt="main" className="w-full h-48 object-cover rounded" />
-                                            </div>
-                                        ) : (
-                                            <p className="text-sm text-muted-foreground mb-3">No main image selected. Choose from uploaded images below or upload from your computer.</p>
-                                        )}
-
-                                        <div className="mb-3">
-                                            <label className="block text-xs tracking-widest uppercase text-muted-foreground mb-2">Upload main image (from computer)</label>
-                                            <input type="file" accept="image/*" onChange={(e) => {
-                                                const f = e.target.files?.[0] || null;
-                                                setProductImageFile(f);
-                                                if (f) setMainPreviewUrl(URL.createObjectURL(f));
-                                                else setMainPreviewUrl(null);
-                                            }} />
                                         </div>
+                                    </TabsContent>
 
-                                        <div className="mt-2">
-                                            <Button size="sm" onClick={() => loadUploads()} disabled={!adminKey || loadingUploads}>{loadingUploads ? "Loading..." : "Browse uploaded images"}</Button>
-                                            <p className="text-xs text-muted-foreground mt-2">Click an uploaded image to set as main or add to gallery. Use delete to remove from server.</p>
-                                            <div className="mt-3 grid grid-cols-3 gap-2">
+                                    <TabsContent value="product">
+                                        <div className="p-4">
+                                            <div className="flex items-center justify-between gap-3 mb-4">
+                                                <h3 className="font-heading text-lg">{productForm.id ? "Edit Product" : "Add Product"}</h3>
+                                                {productForm.id && (
+                                                    <Button variant="outline" onClick={() => setProductForm(emptyProductForm)}>Cancel Edit</Button>
+                                                )}
+                                            </div>
+                                            <form className="space-y-4" onSubmit={handleProductSubmit}>
+                                                <div>
+                                                    <label htmlFor="name" className="block text-xs tracking-widest uppercase text-muted-foreground mb-2">Product Name</label>
+                                                    <input id="name" name="name" required value={productForm.name} onChange={handleProductChange} className="w-full px-4 py-3 bg-background border border-border rounded text-sm focus:outline-none focus:ring-1 focus:ring-ring" />
+                                                </div>
+                                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                                    <div>
+                                                        <label htmlFor="price" className="block text-xs tracking-widest uppercase text-muted-foreground mb-2">Price</label>
+                                                        <input id="price" name="price" required type="number" min="0" value={productForm.price} onChange={handleProductChange} className="w-full px-4 py-3 bg-background border border-border rounded text-sm focus:outline-none focus:ring-1 focus:ring-ring" />
+                                                    </div>
+                                                    <div>
+                                                        <label htmlFor="badge" className="block text-xs tracking-widest uppercase text-muted-foreground mb-2">Badge</label>
+                                                        <input id="badge" name="badge" value={productForm.badge} onChange={handleProductChange} className="w-full px-4 py-3 bg-background border border-border rounded text-sm focus:outline-none focus:ring-1 focus:ring-ring" />
+                                                    </div>
+                                                </div>
+                                                <div>
+                                                    <label htmlFor="category" className="block text-xs tracking-widest uppercase text-muted-foreground mb-2">Category</label>
+                                                    <select id="category" name="category" required value={productForm.category} onChange={handleProductChange} className="w-full px-4 py-3 bg-background border border-border rounded text-sm focus:outline-none focus:ring-1 focus:ring-ring">
+                                                        <option value="">Select category</option>
+                                                        {availableCategories.map((category) => (
+                                                            <option key={category.id} value={category.name}>{category.name}</option>
+                                                        ))}
+                                                    </select>
+                                                </div>
+                                                <div>
+                                                    <label className="block text-xs tracking-widest uppercase text-muted-foreground mb-2">Main Image</label>
+                                                    {mainPreviewUrl ? (
+                                                        <div className="mb-3">
+                                                            <img src={mainPreviewUrl} alt="main-preview" className="w-full h-48 object-cover rounded" />
+                                                        </div>
+                                                    ) : productForm.image ? (
+                                                        <div className="mb-3">
+                                                            <img src={productForm.image} alt="main" className="w-full h-48 object-cover rounded" />
+                                                        </div>
+                                                    ) : (
+                                                        <p className="text-sm text-muted-foreground mb-3">No main image selected. Choose from uploaded images below or upload from your computer.</p>
+                                                    )}
+
+                                                    <div className="mb-3">
+                                                        <label className="block text-xs tracking-widest uppercase text-muted-foreground mb-2">Upload main image (from computer)</label>
+                                                        <input type="file" accept="image/*" onChange={(e) => {
+                                                            const f = e.target.files?.[0] || null;
+                                                            setProductImageFile(f);
+                                                            if (f) setMainPreviewUrl(URL.createObjectURL(f));
+                                                            else setMainPreviewUrl(null);
+                                                        }} />
+                                                    </div>
+
+                                                    <div className="mt-2">
+                                                        <Button size="sm" onClick={() => loadUploads()} disabled={!adminKey || loadingUploads}>{loadingUploads ? "Loading..." : "Browse uploaded images"}</Button>
+                                                        <p className="text-xs text-muted-foreground mt-2">Click an uploaded image to set as main or add to gallery. Use delete to remove from server.</p>
+                                                        <div className="mt-3 grid grid-cols-3 gap-2">
+                                                            {uploadedImages.map((img) => (
+                                                                <div key={img.filename} className="border rounded overflow-hidden">
+                                                                    <img src={img.url} alt={img.filename} className="w-full h-24 object-cover" />
+                                                                    <div className="p-2 flex gap-2">
+                                                                        <Button size="sm" onClick={() => setProductForm((c) => ({ ...c, image: img.url }))}>Set main</Button>
+                                                                        <Button size="sm" onClick={() => setProductForm((c) => ({ ...c, galleryImages: [...(c.galleryImages || []), img.url] }))}>Add</Button>
+                                                                        <Button size="sm" variant="destructive" onClick={() => deleteUploadMutation.mutate(img.filename)} disabled={deleteUploadMutation.isPending}>Del</Button>
+                                                                    </div>
+                                                                </div>
+                                                            ))}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div>
+                                                    <label className="block text-xs tracking-widest uppercase text-muted-foreground mb-2">Gallery Images</label>
+                                                    <div className="mb-3">
+                                                        <label className="block text-xs tracking-widest uppercase text-muted-foreground mb-2">Upload gallery images (multiple)</label>
+                                                        <input
+                                                            type="file"
+                                                            accept="image/*"
+                                                            multiple
+                                                            disabled={((productForm.galleryImages || []).length + (productForm.image ? 1 : 0) + productGalleryFiles.length) >= MAX_GALLERY}
+                                                            onChange={(e) => {
+                                                                const files = e.target.files ? Array.from(e.target.files) : [];
+                                                                const existingCount = (productForm.galleryImages || []).length + (productForm.image ? 1 : 0) + productGalleryFiles.length;
+                                                                const remaining = Math.max(0, MAX_GALLERY - existingCount);
+                                                                if (remaining === 0) {
+                                                                    toast({ title: 'Gallery full', description: `Maximum ${MAX_GALLERY} images allowed` });
+                                                                    e.currentTarget.value = "";
+                                                                    return;
+                                                                }
+                                                                let allowed = files.slice(0, remaining);
+                                                                if (files.length > remaining) {
+                                                                    toast({ title: 'Trimmed selection', description: `Only ${remaining} files accepted` });
+                                                                }
+                                                                if (allowed.length === 0) {
+                                                                    e.currentTarget.value = "";
+                                                                    return;
+                                                                }
+                                                                setProductGalleryFiles((curr) => [...curr, ...allowed]);
+                                                                const previews = allowed.map((f) => URL.createObjectURL(f));
+                                                                setGalleryPreviewUrls((curr) => [...curr, ...previews]);
+                                                                e.currentTarget.value = "";
+                                                            }}
+                                                        />
+                                                    </div>
+
+                                                    <div className="space-y-2">
+                                                        {galleryPreviewUrls.map((p, i) => (
+                                                            <div key={p} className="flex items-center gap-3">
+                                                                <img src={p} alt="preview" className="w-20 h-12 object-cover rounded" />
+                                                                <div className="flex-1 text-sm text-muted-foreground">Local file</div>
+                                                                <Button size="sm" variant="outline" onClick={() => {
+                                                                    setProductGalleryFiles((curr) => curr.filter((_, idx) => idx !== i));
+                                                                    setGalleryPreviewUrls((curr) => curr.filter((_, idx) => idx !== i));
+                                                                }}>Remove</Button>
+                                                            </div>
+                                                        ))}
+
+                                                        <div className="pt-2 text-xs text-muted-foreground">Using {(productForm.image ? 1 : 0) + (productForm.galleryImages || []).length + productGalleryFiles.length} of {MAX_GALLERY} images</div>
+
+                                                        {(productForm.galleryImages || []).map((url) => (
+                                                            <div key={url} className="flex items-center gap-3">
+                                                                <img src={url} alt="gallery" className="w-20 h-12 object-cover rounded" />
+                                                                <div className="flex-1 text-sm text-muted-foreground">Existing</div>
+                                                                <Button size="sm" variant="outline" onClick={() => setProductForm((c) => ({ ...c, galleryImages: (c.galleryImages || []).filter((u) => u !== url) }))}>Remove</Button>
+                                                            </div>
+                                                        ))}
+
+                                                        {!(productForm.galleryImages || []).length && !galleryPreviewUrls.length && <p className="text-sm text-muted-foreground">No gallery images. Add from uploaded images below or upload files.</p>}
+                                                    </div>
+                                                </div>
+                                                <div>
+                                                    <label htmlFor="sizes" className="block text-xs tracking-widest uppercase text-muted-foreground mb-2">Sizes</label>
+                                                    <input id="sizes" name="sizes" required value={productForm.sizes} onChange={handleProductChange} className="w-full px-4 py-3 bg-background border border-border rounded text-sm focus:outline-none focus:ring-1 focus:ring-ring" />
+                                                </div>
+                                                <div>
+                                                    <label htmlFor="description" className="block text-xs tracking-widest uppercase text-muted-foreground mb-2">Description</label>
+                                                    <textarea id="description" name="description" required rows={5} value={productForm.description} onChange={handleProductChange} className="w-full px-4 py-3 bg-background border border-border rounded text-sm focus:outline-none focus:ring-1 focus:ring-ring resize-none" />
+                                                </div>
+                                                <Button type="submit" className="w-full" disabled={saveProductMutation.isPending}>{saveProductMutation.isPending ? "Saving..." : productForm.id ? "Update Product" : "Create Product"}</Button>
+                                            </form>
+                                        </div>
+                                    </TabsContent>
+
+                                    <TabsContent value="uploads">
+                                        <div className="p-4">
+                                            <div className="flex items-center justify-between mb-3">
+                                                <h3 className="font-heading text-lg">Uploaded Images</h3>
+                                                <Button size="sm" onClick={() => loadUploads()} disabled={!adminKey || loadingUploads}>{loadingUploads ? "Loading..." : "Refresh"}</Button>
+                                            </div>
+                                            <p className="text-sm text-muted-foreground mb-3">Click an uploaded image to set as main, add to gallery or delete.</p>
+                                            <div className="grid grid-cols-3 gap-2">
                                                 {uploadedImages.map((img) => (
                                                     <div key={img.filename} className="border rounded overflow-hidden">
                                                         <img src={img.url} alt={img.filename} className="w-full h-24 object-cover" />
@@ -383,76 +489,8 @@ const Admin = () => {
                                                 ))}
                                             </div>
                                         </div>
-                                    </div>
-                                    <div>
-                                        <label className="block text-xs tracking-widest uppercase text-muted-foreground mb-2">Gallery Images</label>
-                                        <div className="mb-3">
-                                            <label className="block text-xs tracking-widest uppercase text-muted-foreground mb-2">Upload gallery images (multiple)</label>
-                                            <input
-                                                type="file"
-                                                accept="image/*"
-                                                multiple
-                                                disabled={((productForm.galleryImages || []).length + (productForm.image ? 1 : 0) + productGalleryFiles.length) >= MAX_GALLERY}
-                                                onChange={(e) => {
-                                                    const files = e.target.files ? Array.from(e.target.files) : [];
-                                                    const existingCount = (productForm.galleryImages || []).length + (productForm.image ? 1 : 0) + productGalleryFiles.length;
-                                                    const remaining = Math.max(0, MAX_GALLERY - existingCount);
-                                                    if (remaining === 0) {
-                                                        toast({ title: 'Gallery full', description: `Maximum ${MAX_GALLERY} images allowed` });
-                                                        e.currentTarget.value = "";
-                                                        return;
-                                                    }
-                                                    let allowed = files.slice(0, remaining);
-                                                    if (files.length > remaining) {
-                                                        toast({ title: 'Trimmed selection', description: `Only ${remaining} files accepted` });
-                                                    }
-                                                    if (allowed.length === 0) {
-                                                        e.currentTarget.value = "";
-                                                        return;
-                                                    }
-                                                    setProductGalleryFiles((curr) => [...curr, ...allowed]);
-                                                    const previews = allowed.map((f) => URL.createObjectURL(f));
-                                                    setGalleryPreviewUrls((curr) => [...curr, ...previews]);
-                                                    e.currentTarget.value = "";
-                                                }}
-                                            />
-                                        </div>
-
-                                        <div className="space-y-2">
-                                            {galleryPreviewUrls.map((p, i) => (
-                                                <div key={p} className="flex items-center gap-3">
-                                                    <img src={p} alt="preview" className="w-20 h-12 object-cover rounded" />
-                                                    <div className="flex-1 text-sm text-muted-foreground">Local file</div>
-                                                    <Button size="sm" variant="outline" onClick={() => {
-                                                        setProductGalleryFiles((curr) => curr.filter((_, idx) => idx !== i));
-                                                        setGalleryPreviewUrls((curr) => curr.filter((_, idx) => idx !== i));
-                                                    }}>Remove</Button>
-                                                </div>
-                                            ))}
-
-                                            <div className="pt-2 text-xs text-muted-foreground">Using {(productForm.image ? 1 : 0) + (productForm.galleryImages || []).length + productGalleryFiles.length} of {MAX_GALLERY} images</div>
-
-                                            {(productForm.galleryImages || []).map((url) => (
-                                                <div key={url} className="flex items-center gap-3">
-                                                    <img src={url} alt="gallery" className="w-20 h-12 object-cover rounded" />
-                                                    <div className="flex-1 text-sm text-muted-foreground">Existing</div>
-                                                    <Button size="sm" variant="outline" onClick={() => setProductForm((c) => ({ ...c, galleryImages: (c.galleryImages || []).filter((u) => u !== url) }))}>Remove</Button>
-                                                </div>
-                                            ))}
-
-                                            {!(productForm.galleryImages || []).length && !galleryPreviewUrls.length && <p className="text-sm text-muted-foreground">No gallery images. Add from uploaded images below or upload files.</p>}
-                                        </div>
-                                    </div>
-                                    <div>
-                                        <label htmlFor="sizes" className="block text-xs tracking-widest uppercase text-muted-foreground mb-2">Sizes</label>
-                                        <input id="sizes" name="sizes" required value={productForm.sizes} onChange={handleProductChange} className="w-full px-4 py-3 bg-background border border-border rounded text-sm focus:outline-none focus:ring-1 focus:ring-ring" />
-                                    </div>
-                                    <div>
-                                        <label htmlFor="description" className="block text-xs tracking-widest uppercase text-muted-foreground mb-2">Description</label>
-                                        <textarea id="description" name="description" required rows={5} value={productForm.description} onChange={handleProductChange} className="w-full px-4 py-3 bg-background border border-border rounded text-sm focus:outline-none focus:ring-1 focus:ring-ring resize-none" />
-                                    </div>
-                                    <Button type="submit" className="w-full" disabled={saveProductMutation.isPending}>{saveProductMutation.isPending ? "Saving..." : productForm.id ? "Update Product" : "Create Product"}</Button>
-                                </form>
+                                    </TabsContent>
+                                </Tabs>
                             </div>
                         </section>
 

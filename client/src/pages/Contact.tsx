@@ -67,6 +67,9 @@ const Contact = () => {
         <div className="text-center mb-16">
           <p className="text-sm tracking-[0.3em] uppercase text-muted-foreground mb-2">Get in Touch</p>
           <h1 className="text-3xl sm:text-4xl font-heading">Contact Us</h1>
+          <p className="text-muted-foreground text-sm mt-3 max-w-2xl mx-auto">
+            Questions about orders, sizes, or custom suggestions? Send us a message and our team will help you quickly.
+          </p>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
@@ -146,7 +149,7 @@ const Contact = () => {
           </div>
 
           <div className="space-y-8">
-            <div>
+            <div className="rounded-xl border border-border bg-card p-5">
               <h3 className="font-heading text-lg mb-4">Visit & Connect</h3>
               <div className="space-y-4 text-sm text-muted-foreground">
                 <div className="flex items-start gap-3">
@@ -164,11 +167,11 @@ const Contact = () => {
               </div>
             </div>
 
-            <div>
+            <div className="rounded-xl border border-border bg-card p-5">
               <h3 className="font-heading text-lg mb-4">Follow Us</h3>
               <div className="flex gap-4 flex-wrap">
                 {instagramUrl ? (
-                  <a href={instagramUrl} className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors">
+                  <a href={instagramUrl} target="_blank" rel="noreferrer" className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors">
                     <Instagram size={18} /> Instagram
                   </a>
                 ) : (
@@ -177,7 +180,7 @@ const Contact = () => {
                   </span>
                 )}
                 {facebookUrl ? (
-                  <a href={facebookUrl} className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors">
+                  <a href={facebookUrl} target="_blank" rel="noreferrer" className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors">
                     <Facebook size={18} /> Facebook
                   </a>
                 ) : (
@@ -186,7 +189,7 @@ const Contact = () => {
                   </span>
                 )}
                 {tiktokUrl ? (
-                  <a href={tiktokUrl} className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors">
+                  <a href={tiktokUrl} target="_blank" rel="noreferrer" className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1 0-5.78 2.92 2.92 0 0 1 .88.13v-3.5a6.37 6.37 0 0 0-.88-.07 6.26 6.26 0 0 0 0 12.52 6.27 6.27 0 0 0 6.26-6.27V8.55a8.16 8.16 0 0 0 3.84.96V6.09a4.84 4.84 0 0 1-1-.1z" /></svg>
                     TikTok
                   </a>

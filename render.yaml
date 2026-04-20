@@ -1,0 +1,18 @@
+services:
+  - type: web
+    name: rabina-closet-server
+    env: node
+    plan: free
+    branch: main
+    buildCommand: "cd server && npm install"
+    startCommand: "cd server && npm start"
+    autoDeploy: true
+    disk: 512
+  - type: static
+    name: rabina-closet-client
+    env: static
+    plan: free
+    branch: main
+    buildCommand: "cd client && npm install && npm run build"
+    staticPublishPath: "client/dist"
+    autoDeploy: true

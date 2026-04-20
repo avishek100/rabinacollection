@@ -1,8 +1,8 @@
 const mongoose = require("mongoose");
-const { env } = require("../config/env");
 
 async function connectToDatabase() {
-  await mongoose.connect(env.mongoUri);
+  const uri = process.env.MONGODB_URI || "mongodb://127.0.0.1:27017/rabina-closet";
+  await mongoose.connect(uri);
 }
 
 module.exports = {

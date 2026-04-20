@@ -46,9 +46,10 @@ const Index = () => {
 
   return (
     <main>
-      <section className="relative h-screen min-h-[600px] flex items-center">
+      <section className="relative h-screen min-h-[600px] flex items-center overflow-hidden">
         <img src={heroBanner} alt="Rabina Closet fashion" className="absolute inset-0 w-full h-full object-cover" width={1920} height={1080} />
-        <div className="absolute inset-0 bg-foreground/20" />
+        <div className="absolute inset-0 bg-foreground/35" />
+        <div className="absolute inset-0 bg-gradient-to-t from-foreground/50 via-foreground/20 to-transparent" />
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
           <div className="max-w-xl animate-fade-in-up">
             <p className="text-sm tracking-[0.3em] uppercase text-primary-foreground/80 mb-4">New Collection 2026</p>
@@ -83,6 +84,11 @@ const Index = () => {
           <p className="text-center text-sm text-muted-foreground">Loading new arrivals...</p>
         ) : isError ? (
           <p className="text-center text-sm text-muted-foreground">We could not load products right now.</p>
+        ) : newArrivals.length === 0 ? (
+          <div className="rounded-xl border border-dashed border-border px-6 py-10 text-center">
+            <p className="font-medium">No new arrivals yet.</p>
+            <p className="mt-2 text-sm text-muted-foreground">Check out the full collection while we prepare fresh drops.</p>
+          </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {newArrivals.map((product) => (
@@ -97,9 +103,9 @@ const Index = () => {
         </div>
       </section>
 
-      <section className="relative h-80 sm:h-96 flex items-center justify-center">
+      <section className="relative h-80 sm:h-96 flex items-center justify-center overflow-hidden">
         <img src={collectionBanner} alt="Collection" className="absolute inset-0 w-full h-full object-cover" loading="lazy" width={1200} height={600} />
-        <div className="absolute inset-0 bg-foreground/30" />
+        <div className="absolute inset-0 bg-foreground/35" />
         <div className="relative z-10 text-center">
           <h2 className="text-3xl sm:text-4xl font-heading text-primary-foreground mb-4">The Essentials Edit</h2>
           <Button asChild className="bg-background text-foreground hover:bg-background/90">
@@ -117,6 +123,11 @@ const Index = () => {
           <p className="text-center text-sm text-muted-foreground">Loading best sellers...</p>
         ) : isError ? (
           <p className="text-center text-sm text-muted-foreground">We could not load products right now.</p>
+        ) : bestSellers.length === 0 ? (
+          <div className="rounded-xl border border-dashed border-border px-6 py-10 text-center">
+            <p className="font-medium">Best sellers are coming soon.</p>
+            <p className="mt-2 text-sm text-muted-foreground">Explore all products to find your favorites now.</p>
+          </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {bestSellers.map((product) => (

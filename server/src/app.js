@@ -2,7 +2,7 @@ const express = require("express");
 const cors = require("cors");
 const path = require("path");
 
-const { env } = require("./config/env");
+// read env from process.env (dotenv loaded in server.js)
 const { storeInfo } = require("./data/storeInfo");
 const { Category } = require("./models/Category");
 const { Product } = require("./models/Product");
@@ -13,20 +13,32 @@ const { categorySchema, contactSchema, newsletterSchema, productSchema } = requi
 
 const app = express();
 const assetsDirectory = path.resolve(__dirname, "../../client/src/assets");
-const uploadsDirectory = path.resolve(__dirname, "../../uploads");
-const fs = require("fs");
+const cloudinary = require("cloudinary").v2;
 
-// Ensure uploads directory exists to avoid ENOENT when listing or saving files
+const cloudinaryConfigured = Boolean(
+  process.env.CLOUDINARY_API_KEY && process.env.CLOUDINARY_API_SECRET &&
+  (process.env.CLOUDINARY_CLOUD_NAME || process.env.CLOUDINARY_NAME),
+);
+
+// Diagnostic: log whether Cloudinary env vars are present (mask secret)
+console.log('CLOUDINARY_CLOUD_NAME=', !!process.env.CLOUDINARY_CLOUD_NAME);
+console.log('CLOUDINARY_API_KEY=', !!process.env.CLOUDINARY_API_KEY);
+console.log('CLOUDINARY_API_SECRET=', !!process.env.CLOUDINARY_API_SECRET);
+console.log('cloudinaryConfigured=', cloudinaryConfigured);
+
+// configure cloudinary from env
 try {
-  if (!fs.existsSync(uploadsDirectory)) {
-    fs.mkdirSync(uploadsDirectory, { recursive: true });
-    console.log("Created uploads directory:", uploadsDirectory);
-  }
+  cloudinary.config({
+    cloud_name: process.env.CLOUDINARY_CLOUD_NAME || process.env.CLOUDINARY_NAME || "",
+    api_key: process.env.CLOUDINARY_API_KEY || "",
+    api_secret: process.env.CLOUDINARY_API_SECRET || "",
+    secure: true,
+  });
 } catch (e) {
-  console.error("Could not ensure uploads directory exists:", e && e.message ? e.message : e);
+  console.error("Cloudinary config error", e && e.message ? e.message : e);
 }
 
-const allowedOrigins = (env.clientOrigin || "").split(",").map((s) => s.trim()).filter(Boolean);
+const allowedOrigins = (process.env.CLIENT_ORIGIN || "http://localhost:5173, http://localhost:8080").split(",").map((s) => s.trim()).filter(Boolean);
 
 app.use(
   cors({
@@ -38,6 +50,20 @@ app.use(
         return callback(null, true);
       }
 
+      // In non-production, allow any localhost/127.0.0.1 origin (different dev ports)
+      if (process.env.NODE_ENV !== "production") {
+        try {
+          const parsed = new URL(incomingOrigin);
+          const hostname = parsed.hostname;
+          if (hostname === "localhost" || hostname === "127.0.0.1") {
+            return callback(null, true);
+          }
+        } catch (e) {
+          // ignore URL parse errors and fall through to block
+        }
+      }
+
+      console.warn("Blocked CORS origin:", incomingOrigin);
       return callback(new Error("Not allowed by CORS"));
     },
     credentials: true,
@@ -46,7 +72,7 @@ app.use(
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 // Serve uploaded images first, then fallback to client assets
-app.use("/static/products", express.static(uploadsDirectory));
+// keep client assets available under /static/products (fallback)
 app.use("/static/products", express.static(assetsDirectory));
 
 // file upload support (lazy-load multer so server still runs if dependency missing)
@@ -59,17 +85,10 @@ app.post("/api/admin/upload", requireAdmin, (req, res) => {
     return res.status(500).json({ message: "Server missing dependency 'multer'. Run: npm install --save multer" });
   }
 
-  const storage = multer.diskStorage({
-    destination: (req, file, cb) => cb(null, uploadsDirectory),
-    filename: (req, file, cb) => {
-      const safeName = `${Date.now()}-${file.originalname.replace(/[^a-zA-Z0-9.\-_]/g, "_")}`;
-      cb(null, safeName);
-    },
-  });
-
+  const storage = multer.memoryStorage();
   const upload = multer({ storage }).single("file");
 
-  upload(req, res, (err) => {
+  upload(req, res, async (err) => {
     if (err) {
       console.error("upload error", err);
       return res.status(500).json({ message: "Upload failed", error: err.message || err });
@@ -77,16 +96,34 @@ app.post("/api/admin/upload", requireAdmin, (req, res) => {
 
     if (!req.file) return res.status(400).json({ message: "No file uploaded" });
 
-    const url = `/static/products/${req.file.filename}`;
-    return res.json({ message: "Upload successful", url });
+    try {
+      if (!cloudinaryConfigured) {
+        console.error("Cloudinary not configured");
+        return res.status(500).json({ message: "Cloudinary not configured" });
+      }
+
+      // upload buffer via data URI to Cloudinary
+      const dataUri = `data:${req.file.mimetype};base64,${req.file.buffer.toString("base64")}`;
+      const result = await cloudinary.uploader.upload(dataUri, { folder: "rabina-closet" });
+      return res.json({ message: "Upload successful", url: result.secure_url, filename: result.public_id });
+    } catch (e) {
+      console.error("upload failed", e && e.message ? e.message : e);
+      return res.status(500).json({ message: "Upload failed" });
+    }
   });
 });
 
 // Admin: list uploaded files
-app.get("/api/admin/uploads", requireAdmin, (req, res) => {
+app.get("/api/admin/uploads", requireAdmin, async (req, res) => {
   try {
-    const files = fs.readdirSync(uploadsDirectory).filter((f) => f !== ".gitkeep");
-    const items = files.map((filename) => ({ filename, url: `/static/products/${filename}` }));
+    if (!cloudinaryConfigured) {
+      console.error("Cloudinary not configured");
+      return res.status(500).json({ message: "Cloudinary not configured" });
+    }
+
+    // list recent upload resources from Cloudinary
+    const response = await cloudinary.api.resources({ max_results: 100, type: "upload" });
+    const items = (response.resources || []).map((r) => ({ filename: r.public_id, url: r.secure_url }));
     return res.json({ items, total: items.length });
   } catch (err) {
     console.error("list uploads error", err);
@@ -95,15 +132,21 @@ app.get("/api/admin/uploads", requireAdmin, (req, res) => {
 });
 
 // Admin: delete uploaded file
-app.delete("/api/admin/uploads/:filename", requireAdmin, (req, res) => {
+app.delete("/api/admin/uploads/:filename", requireAdmin, async (req, res) => {
   try {
-    const filename = path.basename(req.params.filename || "");
-    if (!filename) return res.status(400).json({ message: "Missing filename" });
+    const publicId = req.params.filename;
+    if (!publicId) return res.status(400).json({ message: "Missing filename/public_id" });
+    if (!cloudinaryConfigured) {
+      console.error("Cloudinary not configured");
+      return res.status(500).json({ message: "Cloudinary not configured" });
+    }
 
-    const filePath = path.join(uploadsDirectory, filename);
-    if (!fs.existsSync(filePath)) return res.status(404).json({ message: "File not found" });
+    const result = await cloudinary.uploader.destroy(publicId, { resource_type: "image" });
+    if (result.result !== "ok" && result.result !== "not found") {
+      console.error("cloud delete result", result);
+      return res.status(500).json({ message: "Could not delete file" });
+    }
 
-    fs.unlinkSync(filePath);
     return res.json({ message: "Deleted" });
   } catch (err) {
     console.error("delete upload error", err);
@@ -119,11 +162,15 @@ app.post("/api/admin/login", (req, res) => {
       return res.status(400).json({ message: "Missing username or password" });
     }
 
-    if (username !== env.adminUser || password !== env.adminPass) {
+    const expectedUser = process.env.ADMIN_USER || "";
+    const expectedPass = process.env.ADMIN_PASS || "";
+    const expectedKey = process.env.ADMIN_API_KEY || "";
+
+    if (username !== expectedUser || password !== expectedPass) {
       return res.status(401).json({ message: "Invalid credentials" });
     }
 
-    return res.json({ message: "Login successful", adminKey: env.adminApiKey });
+    return res.json({ message: "Login successful", adminKey: expectedKey });
   } catch (error) {
     return res.status(500).json({ message: "Internal server error" });
   }

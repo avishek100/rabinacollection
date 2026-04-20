@@ -17,7 +17,7 @@ const AdminLogin = () => {
             const key = response.adminKey;
             window.localStorage.setItem("rabina-admin-key", key);
             toast({ title: "Logged in", description: "Admin access granted" });
-            navigate('/admin/dashboard');
+            navigate('/admin/dashboard/products');
         },
         onError: (error: Error) => {
             toast({ title: "Login failed", description: error.message, variant: "destructive" });
