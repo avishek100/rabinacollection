@@ -10,7 +10,6 @@ import { Link, useParams } from "react-router-dom";
 const ProductDetail = () => {
   const { id = "" } = useParams();
   const { addItem } = useCart();
-  const [selectedSize, setSelectedSize] = useState("");
   const [activeImage, setActiveImage] = useState(0);
   const { data: product, isLoading } = useQuery({
     queryKey: ["product", id],
@@ -38,12 +37,11 @@ const ProductDetail = () => {
   }
 
   const handleAddToCart = () => {
-    if (!selectedSize) return;
-    addItem(product, selectedSize);
+    addItem(product, "Custom Size");
   };
 
   const orderWhatsApp = () => {
-    const msg = `Hi! I'd like to order: ${product.name} (Size: ${selectedSize || "N/A"}) - ${formatCurrency(product.price)}`;
+    const msg = `Hi! I'd like to order: ${product.name} (Custom Size) - ${formatCurrency(product.price)}`;
     const waBase = import.meta.env.VITE_WHATSAPP_BASE || "https://wa.me/";
     window.open(`${waBase}?text=${encodeURIComponent(msg)}`, "_blank");
   };
@@ -87,28 +85,16 @@ const ProductDetail = () => {
             <p className="text-xl">{formatCurrency(product.price)}</p>
             <p className="text-sm text-muted-foreground leading-relaxed">{product.description}</p>
 
-            <div>
-              <p className="text-sm font-medium mb-3">Size</p>
-              <div className="flex gap-2 flex-wrap">
-                {product.sizes.map((size) => (
-                  <button
-                    key={size}
-                    onClick={() => setSelectedSize(size)}
-                    className={`w-12 h-12 rounded text-sm transition-colors ${selectedSize === size
-                        ? "bg-primary text-primary-foreground"
-                        : "bg-muted text-muted-foreground hover:bg-secondary"
-                      }`}
-                  >
-                    {size}
-                  </button>
-                ))}
-              </div>
-              {selectedSize && <p className="mt-3 text-xs text-muted-foreground">Selected size: {selectedSize}</p>}
+            <div className="rounded-xl border border-border bg-muted/30 p-4">
+              <p className="text-sm font-medium">Custom Made</p>
+              <p className="mt-2 text-sm text-muted-foreground">
+                This item is made according to your size. Custom tailored to fit you perfectly.
+              </p>
             </div>
 
             <div className="space-y-3 pt-4">
-              <Button onClick={handleAddToCart} disabled={!selectedSize} className="w-full">
-                {selectedSize ? "Add to Bag" : "Select a Size"}
+              <Button onClick={handleAddToCart} className="w-full">
+                Add to Bag
               </Button>
               <Button onClick={orderWhatsApp} variant="outline" className="w-full gap-2">
                 <MessageCircle size={18} />

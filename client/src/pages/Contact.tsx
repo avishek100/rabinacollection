@@ -68,7 +68,7 @@ const Contact = () => {
           <p className="text-sm tracking-[0.3em] uppercase text-muted-foreground mb-2">Get in Touch</p>
           <h1 className="text-3xl sm:text-4xl font-heading">Contact Us</h1>
           <p className="text-muted-foreground text-sm mt-3 max-w-2xl mx-auto">
-            Questions about orders, sizes, or custom suggestions? Send us a message and our team will help you quickly.
+            Questions about orders, measurements, or custom suggestions? Send us a message and our team will help you quickly.
           </p>
         </div>
 

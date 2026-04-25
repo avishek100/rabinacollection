@@ -31,10 +31,7 @@ const productSchema = new mongoose.Schema(
       required: true,
       trim: true,
     },
-    sizes: {
-      type: [String],
-      default: [],
-    },
+
     badge: {
       type: String,
       trim: true,

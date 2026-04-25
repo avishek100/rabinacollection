@@ -22,7 +22,6 @@ const productSchema = z.object({
   image: z.string().trim().min(1),
   images: z.array(z.string().trim().min(1)).min(1),
   description: z.string().trim().min(10).max(3000),
-  sizes: z.array(z.string().trim().min(1)).min(1),
   badge: z.string().trim().max(80).optional().default(""),
 });
 

@@ -75,7 +75,6 @@ const AdminInventory = () => {
                                         )}
                                     </div>
                                     <p className="text-sm text-muted-foreground">{product.description}</p>
-                                    <p className="text-xs text-muted-foreground">Sizes: {product.sizes?.join(", ")}</p>
                                     <div className="flex flex-wrap gap-3 pt-2">
                                         <Button className="w-full sm:w-auto" variant="outline" onClick={() => navigate(`/admin/dashboard/add-product?edit=${product.id}`)}>Edit</Button>
                                         <Button className="w-full sm:w-auto" variant="destructive" onClick={() => handleDelete(product.id)}>Delete</Button>

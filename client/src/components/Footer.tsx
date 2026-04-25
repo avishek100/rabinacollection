@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
-import { Instagram, Facebook } from "lucide-react";
+import { Instagram, Facebook, ShieldCheck } from "lucide-react";
 import { getStoreInfo } from "@/lib/api";
 
 const Footer = () => {
@@ -74,8 +74,12 @@ const Footer = () => {
             </div>
           </div>
         </div>
-        <div className="border-t border-primary-foreground/20 mt-10 pt-6 text-center text-xs opacity-60">
-          <p>&copy; 2026 Rabina Closet. All rights reserved.</p>
+        <div className="border-t border-primary-foreground/20 mt-10 pt-6 flex flex-col sm:flex-row justify-between items-center text-xs opacity-60">
+          <p>&copy; {new Date().getFullYear()} Rabina Closet. All rights reserved.</p>
+          <Link to="/admin" className="mt-4 sm:mt-0 hover:opacity-100 transition-opacity flex items-center gap-1">
+            <ShieldCheck size={12} />
+            <span>Admin Portal</span>
+          </Link>
         </div>
       </div>
     </footer>

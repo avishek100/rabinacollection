@@ -25,7 +25,6 @@ type ProductFormState = {
     image: string;
     galleryImages: string[];
     description: string;
-    sizes: string;
     badge: string;
 };
 
@@ -39,7 +38,6 @@ const emptyProductForm: ProductFormState = {
     image: "",
     galleryImages: [],
     description: "",
-    sizes: "",
     badge: "",
 };
 
@@ -99,7 +97,7 @@ const AdminDashboard = () => {
         });
     }, [inventoryProducts, inventorySearch]);
     const lowStockHintProducts = useMemo(
-        () => (productsQuery.data?.items || []).filter((product) => product.sizes.length <= 1),
+        () => (productsQuery.data?.items || []).filter((product) => false), // You can replace this logic if needed later
         [productsQuery.data?.items],
     );
 
@@ -217,11 +215,6 @@ const AdminDashboard = () => {
             }
         }
 
-        const sizes = productForm.sizes
-            .split(",")
-            .map((entry) => entry.trim())
-            .filter(Boolean);
-
         const images = [mainImageUrl, ...extraImages, ...uploadedGalleryUrls].filter(Boolean);
 
         saveProductMutation.mutate({
@@ -233,7 +226,6 @@ const AdminDashboard = () => {
                 image: mainImageUrl,
                 images,
                 description: productForm.description.trim(),
-                sizes,
                 badge: productForm.badge.trim(),
             },
         });
@@ -272,7 +264,6 @@ const AdminDashboard = () => {
             image: product.image,
             galleryImages: product.images.filter((image) => image !== product.image),
             description: product.description,
-            sizes: product.sizes.join(", "),
             badge: product.badge || "",
         });
         setProductImageFile(null);
@@ -489,7 +480,6 @@ const AdminDashboard = () => {
                                                         )}
                                                     </div>
                                                     <p className="text-sm text-muted-foreground">{product.description}</p>
-                                                    <p className="text-xs text-muted-foreground">Sizes: {product.sizes.join(", ")}</p>
                                                     <div className="flex flex-wrap gap-3 pt-2">
                                                         <Button className="w-full sm:w-auto" variant="outline" onClick={() => startEdit(product)}>Edit</Button>
                                                         <Button
@@ -703,10 +693,6 @@ const AdminDashboard = () => {
 
                                             <div className="pt-2 text-xs text-muted-foreground">Using {(productForm.image ? 1 : 0) + (productForm.galleryImages || []).length + productGalleryFiles.length} of {MAX_GALLERY} images</div>
                                         </div>
-                                    </div>
-                                    <div>
-                                        <label htmlFor="sizes" className="block text-xs tracking-widest uppercase text-muted-foreground mb-2">Sizes</label>
-                                        <input id="sizes" name="sizes" required value={productForm.sizes} onChange={handleProductChange} className="w-full px-4 py-3 bg-background border border-border rounded text-sm focus:outline-none focus:ring-1 focus:ring-ring" />
                                     </div>
                                     <div>
                                         <label htmlFor="description" className="block text-xs tracking-widest uppercase text-muted-foreground mb-2">Description</label>

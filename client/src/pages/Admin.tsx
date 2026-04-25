@@ -24,7 +24,6 @@ type ProductFormState = {
     image: string;
     galleryImages: string[];
     description: string;
-    sizes: string;
     badge: string;
 };
 
@@ -36,7 +35,6 @@ const emptyProductForm: ProductFormState = {
     image: "",
     galleryImages: [],
     description: "",
-    sizes: "",
     badge: "",
 };
 
@@ -215,11 +213,6 @@ const Admin = () => {
             }
         }
 
-        const sizes = productForm.sizes
-            .split(",")
-            .map((entry) => entry.trim())
-            .filter(Boolean);
-
         const images = [mainImageUrl, ...extraImages, ...uploadedGalleryUrls].filter(Boolean);
 
         saveProductMutation.mutate({
@@ -231,7 +224,6 @@ const Admin = () => {
                 image: mainImageUrl,
                 images,
                 description: productForm.description.trim(),
-                sizes,
                 badge: productForm.badge.trim(),
             },
         });
@@ -246,7 +238,6 @@ const Admin = () => {
             image: product.image,
             galleryImages: product.images.filter((image) => image !== product.image),
             description: product.description,
-            sizes: product.sizes.join(", "),
             badge: product.badge || "",
         });
     };
@@ -457,10 +448,6 @@ const Admin = () => {
                                                     </div>
                                                 </div>
                                                 <div>
-                                                    <label htmlFor="sizes" className="block text-xs tracking-widest uppercase text-muted-foreground mb-2">Sizes</label>
-                                                    <input id="sizes" name="sizes" required value={productForm.sizes} onChange={handleProductChange} className="w-full px-4 py-3 bg-background border border-border rounded text-sm focus:outline-none focus:ring-1 focus:ring-ring" />
-                                                </div>
-                                                <div>
                                                     <label htmlFor="description" className="block text-xs tracking-widest uppercase text-muted-foreground mb-2">Description</label>
                                                     <textarea id="description" name="description" required rows={5} value={productForm.description} onChange={handleProductChange} className="w-full px-4 py-3 bg-background border border-border rounded text-sm focus:outline-none focus:ring-1 focus:ring-ring resize-none" />
                                                 </div>
@@ -522,7 +509,6 @@ const Admin = () => {
                                                     )}
                                                 </div>
                                                 <p className="text-sm text-muted-foreground">{product.description}</p>
-                                                <p className="text-xs text-muted-foreground">Sizes: {product.sizes.join(", ")}</p>
                                                 <div className="flex gap-3 pt-2">
                                                     <Button variant="outline" onClick={() => startEdit(product)}>Edit</Button>
                                                     <Button variant="outline" onClick={() => deleteProductMutation.mutate(product.id)} disabled={deleteProductMutation.isPending}>Delete</Button>

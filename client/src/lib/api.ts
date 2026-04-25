@@ -44,7 +44,6 @@ export type ProductPayload = {
   image: string;
   images: string[];
   description: string;
-  sizes: string[];
   badge?: string;
 };
 
