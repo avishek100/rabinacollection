@@ -1,63 +1,147 @@
-Prerequisites
-- Git repo connected to Vercel and Render (or push to GitHub/GitLab).
-- Ensure `.env` values are set on Render and Vercel project settings (see below).
+# Rabina Closet — Deployment Guide
 
-Frontend — Vercel
-1. Create a new Vercel project and point it at the `client` folder of this repo (set "Root Directory" to `/client`).
-2. Build command: `npm run build`
-3. Output directory: `dist`
-4. Environment variables (if needed):
-   - `VITE_API_URL` -> https://<your-render-server-url>
+> Full-stack fashion storefront: **Vite React** (client) + **Express + MongoDB** (server)
 
-Notes: A `client/vercel.json` is included to instruct Vercel to use `@vercel/static-build` and to rewrite routes to `index.html`.
+---
 
-Backend — Render
-1. Create a new Web Service on Render and connect your repo.
-2. Set the service root to the repository root and use the following settings (or import from `render.yaml`):
-   - Service type: `Web Service`
-   - Build Command: `cd server && npm install`
-   - Start Command: `cd server && npm start`
-   - Environment: `Node`
-3. Set environment variables in Render (Environment tab):
-   - `PORT` (Render will set automatically; keep default)
-   - `MONGODB_URI` -> your MongoDB connection string
-   - `CLIENT_ORIGIN` -> https://<your-vercel-domain>
-   - `ADMIN_USER`, `ADMIN_PASS`, `ADMIN_API_KEY`
+## Architecture
 
-Static Frontend on Render (alternative)
-- You can also host the frontend as a static site on Render using the second service in `render.yaml` (static site type). It runs `cd client && npm run build` and publishes `client/dist`.
-
-CORS and env notes
-- The server uses `CLIENT_ORIGIN` to allow requests from the frontend. Set `CLIENT_ORIGIN` to your Vercel site URL (e.g. `https://your-app.vercel.app`). You can provide multiple origins as a comma-separated list.
-- The server reads `PORT` and `MONGODB_URI` from env; Render provides `PORT` automatically.
-
-Local testing before deploy
-- Start server locally:
-
-```powershell
-cd server
-npm install
-npm run dev
+```
+┌─────────────────────┐        ┌──────────────────────────┐
+│   Vercel (Static)   │  API   │   Render (Web Service)   │
+│   React SPA (Vite)  │───────▶│   Express + Mongoose     │
+│   client/dist       │        │   server/src/server.js   │
+└─────────────────────┘        └──────────┬───────────────┘
+                                          │
+                                          ▼
+                               ┌──────────────────────┐
+                               │   MongoDB Atlas       │
+                               │   (cloud database)    │
+                               └──────────────────────┘
 ```
 
-- Start client locally:
+---
 
-```powershell
-cd client
-npm install
-npm run dev
+## Prerequisites
+
+- **Node.js** ≥ 18
+- **MongoDB Atlas** cluster (or any MongoDB URI)
+- **Cloudinary** account (for image uploads)
+- Git repository pushed to GitHub/GitLab
+
+---
+
+## 1. Frontend — Vercel
+
+1. Create a **new Vercel project** and import your repo.
+2. Set **Root Directory** → `client`
+3. Vercel auto-detects Vite. Confirm settings:
+   | Setting          | Value            |
+   |------------------|------------------|
+   | Framework        | Vite             |
+   | Build Command    | `npm run build`  |
+   | Output Directory | `dist`           |
+4. **Environment variables** (Settings → Environment Variables):
+   | Variable             | Value                                       |
+   |----------------------|---------------------------------------------|
+   | `VITE_API_URL`       | `https://rabina-closet-server.onrender.com`  |
+   | `VITE_WHATSAPP_BASE` | `https://wa.me/9743685571`                   |
+
+> **Note:** `VITE_API_URL` must point to your deployed Render server URL (no trailing slash).
+
+---
+
+## 2. Backend — Render
+
+1. Create a **new Web Service** on Render and connect your repo.
+2. Configure:
+   | Setting          | Value                             |
+   |------------------|-----------------------------------|
+   | Runtime          | Node                              |
+   | Build Command    | `cd server && npm install`        |
+   | Start Command    | `cd server && node src/server.js` |
+   | Health Check     | `/api/health`                     |
+
+   > Or import `render.yaml` directly from the repo root for automatic setup.
+
+3. **Environment variables** (Environment tab):
+   | Variable                | Value                          |
+   |-------------------------|--------------------------------|
+   | `NODE_ENV`              | `production`                   |
+   | `MONGODB_URI`           | `mongodb+srv://...`            |
+   | `CLIENT_ORIGIN`         | `https://your-app.vercel.app`  |
+   | `ADMIN_USER`            | *(your admin username)*        |
+   | `ADMIN_PASS`            | *(your admin password)*        |
+   | `ADMIN_API_KEY`         | *(generate: `node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"`)* |
+   | `CLOUDINARY_CLOUD_NAME` | *(your Cloudinary cloud name)* |
+   | `CLOUDINARY_API_KEY`    | *(your Cloudinary API key)*    |
+   | `CLOUDINARY_API_SECRET` | *(your Cloudinary API secret)* |
+
+   > `PORT` is set automatically by Render — do not override it.
+
+---
+
+## 3. CORS Configuration
+
+The server reads `CLIENT_ORIGIN` to allow cross-origin requests. Set it to your **exact Vercel domain** (e.g., `https://rabinacloset.vercel.app`).
+
+For multiple origins, use a **comma-separated** list:
+```
+CLIENT_ORIGIN=https://rabinacloset.vercel.app,https://www.rabinacloset.com
 ```
 
-Troubleshooting
-- If uploads rely on `multer`, ensure `multer` is installed in `server/package.json` (already added).
-- If you see CORS errors after deployment, confirm `CLIENT_ORIGIN` matches the exact origin served by Vercel/Render.
+---
 
-Files added
-- `client/vercel.json` — Vercel static-build config for the client.
-- `render.yaml` — Render manifest for server and client (optional import).
-- `DEPLOY.md` — This deployment guide.
+## 4. Local Development
 
-If you want, I can:
-- Add a GitHub Action to build client and push static files to a CDN.
-- Add a `Procfile` or extra Render health checks.
-- Configure immediate upload-on-select behavior or serverless upload handlers for Vercel Functions.
+```bash
+# Install all dependencies
+npm run install:all
+
+# Terminal 1 — start the API server
+npm run dev:server
+
+# Terminal 2 — start the Vite dev server
+npm run dev:client
+```
+
+The Vite dev server proxies `/api` and `/static` requests to `http://localhost:3001` automatically — no `VITE_API_URL` needed locally.
+
+---
+
+## 5. Local Production Build Test
+
+```bash
+# From the project root
+npm run build          # installs deps + builds client
+
+# Start the server
+npm start              # runs server/src/server.js
+```
+
+Then open `http://localhost:3001/api/health` to verify the API is running.
+
+---
+
+## Quick Reference — File Map
+
+| File                    | Purpose                                        |
+|-------------------------|-------------------------------------------------|
+| `package.json`          | Root scripts: `build`, `start`, `install:all`  |
+| `render.yaml`           | Render Blueprint — auto-configures both services|
+| `client/vercel.json`    | Vercel config — SPA rewrites + security headers|
+| `server/.env.example`   | Template for server environment variables      |
+| `client/.env.example`   | Template for client environment variables      |
+| `.gitignore`            | Excludes `.env`, `node_modules`, `dist`        |
+
+---
+
+## Troubleshooting
+
+| Issue                        | Fix                                                                                 |
+|------------------------------|-------------------------------------------------------------------------------------|
+| CORS errors after deploy     | Verify `CLIENT_ORIGIN` matches exact Vercel URL (including `https://`)             |
+| Images not uploading         | Check all 3 Cloudinary env vars are set on Render                                  |
+| 404 on page refresh (Vercel) | Ensure `vercel.json` `rewrites` rule is present                                    |
+| Server won't start on Render | Confirm `MONGODB_URI` is set; check Render logs                                   |
+| `npm run build` fails at root| Run from the **project root** (not `client/` or `server/`)                         |

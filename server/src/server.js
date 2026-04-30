@@ -13,9 +13,20 @@ async function startServer() {
   await seedDatabase();
 
   const port = Number(process.env.PORT || 3001);
-  app.listen(port, () => {
-    console.log(`Rabina Closet API running on http://localhost:${port}`);
+  // Bind to 0.0.0.0 so cloud hosts (Render, Railway, etc.) can reach the server
+  const host = "0.0.0.0";
+  const server = app.listen(port, host, () => {
+    console.log(`[${process.env.NODE_ENV || "development"}] Rabina Closet API running on http://${host}:${port}`);
   });
+
+  // Graceful shutdown
+  const shutdown = (signal) => {
+    console.log(`\n${signal} received — shutting down gracefully`);
+    server.close(() => process.exit(0));
+    setTimeout(() => process.exit(1), 10_000); // force exit after 10s
+  };
+  process.on("SIGTERM", () => shutdown("SIGTERM"));
+  process.on("SIGINT", () => shutdown("SIGINT"));
 }
 
 startServer().catch((error) => {

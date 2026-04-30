@@ -1,0 +1,22 @@
+{
+  "name": "rabinacollection",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Rabina Closet — Full-stack fashion storefront (Vite + Express + MongoDB)",
+  "scripts": {
+    "dev:client": "cd client && npm run dev",
+    "dev:server": "cd server && npm run dev",
+    "build:client": "cd client && npm install && npm run build",
+    "build:server": "cd server && npm install",
+    "build": "npm run build:server && npm run build:client",
+    "start": "cd server && npm start",
+    "install:all": "cd server && npm install && cd ../client && npm install",
+    "clean": "cd client && rmdir /s /q dist 2>nul & cd ../server && rmdir /s /q node_modules 2>nul"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "keywords": ["fashion", "storefront", "ecommerce"],
+  "author": "Rabina Closet",
+  "license": "ISC"
+}
