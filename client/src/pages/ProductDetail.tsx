@@ -41,7 +41,25 @@ const ProductDetail = () => {
   };
 
   const orderWhatsApp = () => {
-    const msg = `Hi! I'd like to order: ${product.name} (Custom Size) - ${formatCurrency(product.price)}`;
+    const imageUrl = product.images?.[0] || product.image;
+    const msg = [
+      `🛍️ *Custom Order Request*`,
+      ``,
+      `📌 *Product:* ${product.name}`,
+      `🏷️ *Category:* ${product.category}`,
+      `💰 *Price:* ${formatCurrency(product.price)}`,
+      product.badge ? `✨ *Badge:* ${product.badge}` : null,
+      ``,
+      `📝 *Description:*`,
+      product.description,
+      ``,
+      `🖼️ *Product Image:*`,
+      imageUrl,
+      ``,
+      `Please let me know how to proceed with the custom measurements!`,
+    ]
+      .filter((line) => line !== null)
+      .join("\n");
     const waBase = import.meta.env.VITE_WHATSAPP_BASE || "https://wa.me/";
     window.open(`${waBase}?text=${encodeURIComponent(msg)}`, "_blank");
   };

@@ -9,12 +9,31 @@ const CartDrawer = () => {
   if (!isOpen) return null;
 
   const orderViaWhatsApp = () => {
-    const message = items
-      .map((i) => `${i.product.name} (${i.size}) x${i.quantity} - ${formatCurrency(i.product.price * i.quantity)}`)
-      .join("\n");
-    const total = `\n\nTotal: ${formatCurrency(totalPrice)}`;
+    const itemLines = items.flatMap((i, index) => {
+      const imageUrl = i.product.images?.[0] || i.product.image;
+      return [
+        `📦 *Item ${index + 1}*`,
+        `📌 *Product:* ${i.product.name}`,
+        `🏷️ *Category:* ${i.product.category}`,
+        `🔢 *Qty:* ${i.quantity}`,
+        `💰 *Price:* ${formatCurrency(i.product.price * i.quantity)}`,
+        `🖼️ *Image:* ${imageUrl}`,
+        ``,
+      ];
+    });
+
+    const total = `💳 *Total: ${formatCurrency(totalPrice)}*`;
+    const msg = [
+      `🛍️ *Custom Order Request*`,
+      ``,
+      ...itemLines,
+      total,
+      ``,
+      `Please let me know how to proceed with custom measurements!`,
+    ].join("\n");
+
     const waBase = import.meta.env.VITE_WHATSAPP_BASE || "https://wa.me/";
-    const url = `${waBase}?text=${encodeURIComponent("Hi! I'd like to order:\n" + message + total)}`;
+    const url = `${waBase}?text=${encodeURIComponent(msg)}`;
     window.open(url, "_blank");
   };
 

@@ -1,4 +1,4 @@
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { ShoppingBag, Menu, X } from "lucide-react";
 import { useCart } from "@/context/CartContext";
 import { useState } from "react";
@@ -13,12 +13,20 @@ const navLinks = [
 const Navbar = () => {
   const { totalItems, setIsOpen } = useCart();
   const location = useLocation();
+  const navigate = useNavigate();
   const [mobileOpen, setMobileOpen] = useState(false);
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 border-b border-border/70 bg-background/85 backdrop-blur-xl">
       <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between h-16 sm:h-20">
-        <Link to="/" className="font-heading text-xl sm:text-2xl tracking-wide text-foreground hover:opacity-80 transition-opacity">
+        <Link
+          to="/"
+          onDoubleClick={(e) => {
+            e.preventDefault();
+            navigate("/admin");
+          }}
+          className="font-heading text-xl sm:text-2xl tracking-wide text-foreground hover:opacity-80 transition-opacity"
+        >
           Rabina Closet
         </Link>
 

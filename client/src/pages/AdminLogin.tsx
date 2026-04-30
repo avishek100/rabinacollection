@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { useMutation } from "@tanstack/react-query";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 const AdminLogin = () => {
@@ -9,6 +9,14 @@ const AdminLogin = () => {
     const [password, setPassword] = useState("");
     const { toast } = useToast();
     const navigate = useNavigate();
+
+    // Auto-redirect to dashboard if already logged in
+    useEffect(() => {
+        const existingKey = window.localStorage.getItem("rabina-admin-key");
+        if (existingKey) {
+            navigate("/admin/dashboard/products", { replace: true });
+        }
+    }, [navigate]);
 
     const loginMutation = useMutation({
         mutationFn: ({ username, password }: { username: string; password: string }) =>
